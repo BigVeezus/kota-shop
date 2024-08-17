@@ -46,13 +46,15 @@ var Register = http.HandlerFunc(func(response http.ResponseWriter, request *http
 	password := hashPassword(newUser.Password)
 	newUser.Password = password
 
-	_, err = usersCollection.InsertOne(ctx, newUser)
+	result, err := usersCollection.InsertOne(ctx, newUser)
 	if err != nil {
 		middlewares.BadRequestErrResponse(err.Error(), response)
 		return
 	}
 
-	validToken, err := middlewares.GenerateJWT()
+	res, _ := json.Marshal(result.InsertedID)
+
+	validToken, err := middlewares.GenerateJWT(newUser.Name, string(res))
 	if err != nil {
 		middlewares.ErrorResponse("Failed to generate token", response)
 	}
@@ -92,7 +94,7 @@ var Login = http.HandlerFunc(func(response http.ResponseWriter, request *http.Re
 		return
 	}
 
-	validToken, err := middlewares.GenerateJWT()
+	validToken, err := middlewares.GenerateJWT(existingUser.Name, existingUser.ID.String())
 	if err != nil {
 		middlewares.ErrorResponse("Failed to generate token", response)
 		return

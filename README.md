@@ -36,8 +36,10 @@ $ go mod vendor
 
 Starting the dev server also starts MongoDB as a service in a docker container using the compose script at `docker-compose.yml`.
 
+Add a `.env` file and transfer the values from the `.env.default` to the `env` file
+
 ```
-$ go run main.go routes.go
+$ go run main.go
 ```
 
 Running the above commands results in
@@ -51,7 +53,13 @@ Running the above commands results in
 #### 1. Build and run without Docker
 
 ```
-$ go build
+$ go build -o kota-shop-api -v
+```
+
+then run
+
+```
+./kota-shop-api
 ```
 
 #### 2. Run Tests
@@ -97,7 +105,8 @@ The application uses [winston](https://github.com/winstonjs/winston) as the defa
 
 ```
 +-- controllers
-|   +-- personController.go
+|   +-- authController.go
+|   +-- itemsController.go
 +-- db
 |   +-- db.go
 +-- handlers
@@ -106,11 +115,11 @@ The application uses [winston](https://github.com/winstonjs/winston) as the defa
 |   +-- response.go
 |   +-- verifyJWT.go
 +-- models
-|   +-- models.go
+|   +-- auth.go
+|   +-- itemsModel.go
+|   +-- userModel.go
 +-- validators
 |   +-- validators.go
-+-- tests
-|   +-- api_test.go
 +-- routes
 |   +-- routes.go
 +-- uploaded

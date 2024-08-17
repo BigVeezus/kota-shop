@@ -3,6 +3,7 @@ package middlewares
 import (
 	"fmt"
 	"net/http"
+	"strings"
 	"time"
 
 	jwt "github.com/dgrijalva/jwt-go"
@@ -16,7 +17,10 @@ func IsAuthorized(next http.Handler) http.HandlerFunc {
 
 		if r.Header["Authorization"] != nil {
 
-			token, err := jwt.Parse(r.Header["Authorization"][0], func(token *jwt.Token) (interface{}, error) {
+			tokenArray := strings.Fields(r.Header["Authorization"][0])
+			tokenString := tokenArray[1]
+
+			token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
 				if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
 					return nil, fmt.Errorf("there was an error")
 				}
@@ -24,7 +28,7 @@ func IsAuthorized(next http.Handler) http.HandlerFunc {
 			})
 
 			if err != nil {
-				UnauthorizedErrResponse("Invalid JWT token", w)
+				UnauthorizedErrResponse(err.Error(), w)
 			}
 
 			if token.Valid {
@@ -37,13 +41,14 @@ func IsAuthorized(next http.Handler) http.HandlerFunc {
 }
 
 // GenerateJWT -> generate jwt
-func GenerateJWT() (string, error) {
+func GenerateJWT(name string, id string) (string, error) {
 	token := jwt.New(jwt.SigningMethodHS256)
 
 	claims := token.Claims.(jwt.MapClaims)
 
 	claims["authorized"] = true
-	claims["client"] = "Elliot Forbes"
+	claims["client"] = name
+	claims["id"] = id
 	claims["exp"] = time.Now().Add(time.Minute * 30).Unix()
 
 	tokenString, err := token.SignedString(mySigningKey)
