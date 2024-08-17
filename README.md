@@ -53,7 +53,7 @@ Running the above commands results in
 #### 1. Build and run without Docker
 
 ```
-$ go build -o kota-shop-api -v
+$ go build -o kota-shop -v
 ```
 
 then run
