@@ -4,9 +4,9 @@ The development environment uses `docker-compose` to start dependent services li
 
 A few things to note in the project:
 
-- **[Github Actions Workflows](https://github.com/umangraval/Go-Mongodb-REST-boilerplate/tree/main/.github/workflows)** - Pre-configured Github Actions to run automated builds and publish image to Github Packages
-- **[Dockerfile](https://github.com/umangraval/Go-Mongodb-REST-boilerplate/blob/main/Dockerfile)** - Dockerfile to generate docker builds.
-- **[docker-compose](https://github.com/umangraval/Go-Mongodb-REST-boilerplate/blob/main/docker-compose.yml)** - Docker compose script to start service in production mode.
+- **[Github Actions Workflows](https://github.com/BigVeezus/kota-shop/tree/main/.github/workflows)** - Pre-configured Github Actions to run automated builds and publish image to Github Packages
+- **[Dockerfile](https://github.com/BigVeezus/kota-shop/blob/main/Dockerfile)** - Dockerfile to generate docker builds.
+- **[docker-compose](https://github.com/BigVeezus/kota-shop/blob/main/docker-compose.yml)** - Docker compose script to start service in production mode.
 - **[Containerized Mongo for development](#development)** - Starts a local mongo container with data persistence across runs.
 - **[Mongo Driver](https://go.mongodb.org/mongo-driver)** - MongoDB supported driver for Go.
 - **[Gorilla Mux](https://go.mongodb.org/mongo-driver)** - HTTP request multiplexer.
@@ -20,8 +20,8 @@ A few things to note in the project:
 #### 1. Clone this repo
 
 ```
-$ git clone git@github.com:umangraval/Go-Mongodb-REST-boilerplate.git your-app-name
-$ cd your-app-name
+$ git clone https://github.com/BigVeezus/kota-shop.git
+$ cd kota-shop
 ```
 
 #### 2. Install dependencies
