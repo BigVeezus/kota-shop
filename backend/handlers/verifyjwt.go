@@ -49,7 +49,7 @@ func GenerateJWT(name string, id string) (string, error) {
 	claims["authorized"] = true
 	claims["client"] = name
 	claims["id"] = id
-	claims["exp"] = time.Now().Add(time.Minute * 30).Unix()
+	claims["exp"] = time.Now().Add(time.Minute * 200).Unix()
 
 	tokenString, err := token.SignedString(mySigningKey)
 

@@ -73,6 +73,7 @@ var GetAllItems = http.HandlerFunc(func(response http.ResponseWriter, request *h
 		middlewares.InternalServerErrResponse(err.Error(), response)
 		return
 	}
+
 	middlewares.SuccessResponse("Got all items", items, response)
 })
 

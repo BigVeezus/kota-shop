@@ -18,7 +18,7 @@ func Dbconnect() *mongo.Client {
 	client, err := mongo.Connect(context.TODO(), clientOptions)
 	if err != nil {
 		// log.Fatalln(middlewares.DotEnvVariable("MONGO_URL"))
-		log.Fatal("⛒ Connection Failed to Database - ", middlewares.DotEnvVariable("MONGO_URL"), err.Error())
+		log.Fatal("⛒ Connection Failed to Database - ", err.Error())
 		log.Fatal(err)
 	}
 	// Check the connection
@@ -26,7 +26,7 @@ func Dbconnect() *mongo.Client {
 	if err != nil {
 		// log.Fatalln(middlewares.DotEnvVariable("MONGO_URL"))
 
-		log.Fatal("⛒ Connection Failed to Database - ", middlewares.DotEnvVariable("MONGO_URL"), err.Error())
+		log.Fatal("⛒ Connection Failed to Database - ", err.Error())
 		log.Fatal(err)
 	}
 	color.Green("⛁ Connected to Database")
