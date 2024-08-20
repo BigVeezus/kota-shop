@@ -13,7 +13,6 @@ function Login() {
   const authContext = useContext(AuthContext);
   const navigate = useNavigate();
 
-
   const handleInputChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
@@ -23,14 +22,14 @@ function Login() {
 
     // Validate form data
     if (form.email === "" || form.password === "") {
-    toast.error("To login user, enter details to proceed...");
+      toast.error("To login user, enter details to proceed...");
       return; // Prevent API call if validation fails
     }
 
     fetch("http://localhost:8080/login", {
       method: "POST",
       headers: {
-        "Content-type": "application/json",
+        "Content-Type": "application/json",
       },
       body: JSON.stringify(form),
     })
@@ -61,7 +60,6 @@ function Login() {
     e.preventDefault();
   };
 
-  
   return (
     <>
       <div className="grid grid-cols-1 sm:grid-cols-2 h-screen  items-center place-items-center">
@@ -141,9 +139,7 @@ function Login() {
               </div>
 
               <div className="text-sm">
-                <span
-                  className="font-medium text-indigo-600 hover:text-indigo-500"
-                >
+                <span className="font-medium text-indigo-600 hover:text-indigo-500">
                   Forgot your password?
                 </span>
               </div>
@@ -165,9 +161,7 @@ function Login() {
               </button>
               <p className="mt-2 text-center text-sm text-gray-600">
                 Or{" "}
-                <span
-                  className="font-medium text-indigo-600 hover:text-indigo-500"
-                >
+                <span className="font-medium text-indigo-600 hover:text-indigo-500">
                   Don't Have an Account, Please{" "}
                   <Link to="/register"> Register now </Link>
                 </span>

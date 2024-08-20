@@ -13,19 +13,20 @@ export default function AddProduct({
     userId: authContext.user,
     name: "",
     type: "",
-   quantity: "",
+    quantity: 0,
   });
-  console.log("----",product)
+  console.log("----", product);
   const [open, setOpen] = useState(true);
   const cancelButtonRef = useRef(null);
 
   const handleInputChange = (key, value) => {
     if (key === "type") {
       value = value.toUpperCase(); // Convert the type to uppercase
+    } else if (key === "quantity") {
+      value = parseInt(value);
     }
     setProduct({ ...product, [key]: value });
   };
-
 
   const addProduct = () => {
     // Basic validation to ensure fields are not empty
@@ -33,11 +34,22 @@ export default function AddProduct({
       toast.error("All fields are required.");
       return;
     }
-  
+
+    if (
+      product.type !== "FOOD" &&
+      product.type !== "DRINK" &&
+      product.type !== "SNACK" &&
+      product.type !== "FRUIT"
+    ) {
+      toast.error("Type must be `FOOD`, `DRINK`, `SNACK` or `FRUIT`");
+      return;
+    }
+
     fetch("http://localhost:8080/item", {
       method: "POST",
       headers: {
         "Content-type": "application/json",
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
       },
       body: JSON.stringify(product),
     })
@@ -58,7 +70,6 @@ export default function AddProduct({
         toast.error("Failed to add the product.");
       });
   };
-  
 
   return (
     // Modal
@@ -134,7 +145,7 @@ export default function AddProduct({
                               htmlFor="type"
                               className="block mb-2 text-sm font-medium text-gray-900 "
                             >
-                       Type
+                              Type
                             </label>
                             <input
                               type="text"
@@ -148,7 +159,7 @@ export default function AddProduct({
                               placeholder="Ex. FOOD,FRUIT and DRINKS"
                             />
                           </div>
-                        
+
                           <div>
                             <label
                               for="quantity"
@@ -167,13 +178,9 @@ export default function AddProduct({
                               className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 "
                               placeholder="0 - 9999"
                             />
-                          </div> 
-
-                   
+                          </div>
                         </div>
-                        <div className="flex items-center space-x-4">
-                      
-                        </div>
+                        <div className="flex items-center space-x-4"></div>
                       </form>
                     </div>
                   </div>

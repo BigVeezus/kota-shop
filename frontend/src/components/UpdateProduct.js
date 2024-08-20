@@ -18,7 +18,10 @@ export default function UpdateProduct({
   const cancelButtonRef = useRef(null);
 
   const handleInputChange = (key, value) => {
-    console.log(key);
+    console.log(value);
+    if (key === "quantity") {
+      value = parseInt(value);
+    }
     setProduct({ ...product, [key]: value });
   };
 
@@ -32,7 +35,7 @@ export default function UpdateProduct({
         product.type === type &&
         product.quantity === quantity)
     ) {
-    toast.error("No changes detected or fields are empty.");
+      toast.error("No changes detected or fields are empty.");
       return;
     }
 
@@ -41,11 +44,12 @@ export default function UpdateProduct({
       method: "PUT",
       headers: {
         "Content-type": "application/json",
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
       },
       body: JSON.stringify(product),
     })
       .then((result) => {
-       toast.success("Product Updated");
+        toast.success("Product Updated");
         setOpen(false);
       })
       .catch((err) => console.log(err));
@@ -125,7 +129,7 @@ export default function UpdateProduct({
                               htmlFor="type"
                               className="block mb-2 text-sm font-medium text-gray-900 "
                             >
-                            Type
+                              Type
                             </label>
                             <input
                               type="text"
@@ -144,12 +148,12 @@ export default function UpdateProduct({
                               htmlFor="description"
                               className="block mb-2 text-sm font-medium text-gray-900 "
                             >
-                            Quantity
+                              Quantity
                             </label>
                             <input
                               type="text"
-                              name="type"
-                              id="type"
+                              name="quantity"
+                              id="quantity"
                               value={product.quantity}
                               onChange={(e) =>
                                 handleInputChange(e.target.name, e.target.value)
@@ -157,12 +161,9 @@ export default function UpdateProduct({
                               className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5"
                               placeholder="Ex. Apple"
                             />
-                          
                           </div>
                         </div>
-                        <div className="flex items-center space-x-4">
-                       
-                        </div>
+                        <div className="flex items-center space-x-4"></div>
                       </form>
                     </div>
                   </div>

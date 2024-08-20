@@ -5,10 +5,8 @@ import toast from "react-hot-toast";
 
 function Register() {
   const [form, setForm] = useState({
-  
     email: "",
     password: "",
-
   });
 
   const navigate = useNavigate();
@@ -22,46 +20,44 @@ function Register() {
   const registerUser = (e) => {
     e.preventDefault(); // Prevent default form submission
     if (form.email === "" || form.password === "") {
-    toast.error("To register user, enter details to proceed...");
+      toast.error("To register user, enter details to proceed...");
       return; // Prevent API call if validation fails
     }
 
-    fetch("http://localhost:8080/api/register", {
+    fetch("http://localhost:8080/auth", {
       method: "POST",
       headers: {
-        "Content-type": "application/json",
+        "Content-Type": "application/json",
       },
       body: JSON.stringify(form),
     })
       .then((response) => response.json())
       .then((data) => {
         if (data.status === 200) {
-    toast.success("Successfully Registered. Now Login with your details");
+          toast.success("Successfully Registered. Now Login with your details");
 
           // Store token and user data in localStorage
           //uncomment this if you want the user to be logged in immediately after registration
           // localStorage.setItem("token", data.msg);
           // localStorage.setItem("user", JSON.stringify(data.data));
 
-          // Navigate to the login page or change this to '/' if you want the user to be logged in 
+          // Navigate to the login page or change this to '/' if you want the user to be logged in
           navigate("/login");
         } else {
-         toast.error("Registration failed. Please try again.");
+          toast.error("Registration failed. Please try again.");
         }
       })
       .catch((err) => {
         console.log("Error during registration: ", err);
-       toast.error("An error occurred. Please try again.");
+        toast.error("An error occurred. Please try again.");
       });
   };
 
   // ------------------
 
-
-
   const handleSubmit = (e) => {
     e.preventDefault();
-  }
+  };
 
   return (
     <>
@@ -80,7 +76,6 @@ function Register() {
           <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
             {/* <input type="hidden" name="remember" defaultValue="true"  /> */}
             <div className="flex flex-col gap-4 -space-y-px rounded-md shadow-sm">
-              
               <div>
                 <input
                   id="email-address"
@@ -107,11 +102,8 @@ function Register() {
                   onChange={handleInputChange}
                 />
               </div>
-           
-           
             </div>
 
-           
             <div>
               <button
                 type="submit"
@@ -128,9 +120,7 @@ function Register() {
               </button>
               <p className="mt-2 text-center text-sm text-gray-600">
                 Or{" "}
-                <span
-                  className="font-medium text-indigo-600 hover:text-indigo-500"
-                >
+                <span className="font-medium text-indigo-600 hover:text-indigo-500">
                   Already Have an Account, Please
                   <Link to="/login"> Sign in now </Link>
                 </span>
