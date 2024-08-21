@@ -36,7 +36,7 @@ var CreateItem = http.HandlerFunc(func(response http.ResponseWriter, request *ht
 		return
 	}
 
-	id := middlewares.RemoveExtraQuotes(userId.(string))
+	id := middlewares.RemoveExtraQuotes(userId)
 
 	item.ID = primitive.NewObjectID()
 	item.UserId = id
@@ -58,7 +58,7 @@ var GetAllItems = http.HandlerFunc(func(response http.ResponseWriter, request *h
 
 	userId := middlewares.GetUserIDFromContext(ctx)
 
-	id := middlewares.RemoveExtraQuotes(userId.(string))
+	id := middlewares.RemoveExtraQuotes(userId)
 
 	var items []*models.FoodItemModel
 

@@ -94,7 +94,9 @@ var Login = http.HandlerFunc(func(response http.ResponseWriter, request *http.Re
 		return
 	}
 
-	validToken, err := middlewares.GenerateJWT(existingUser.Name, existingUser.ID.String())
+	println(existingUser.ID.Hex())
+
+	validToken, err := middlewares.GenerateJWT(existingUser.Name, existingUser.ID.Hex())
 	if err != nil {
 		middlewares.ErrorResponse("Failed to generate token", response)
 		return

@@ -58,8 +58,8 @@ func IsAuthorized(next http.Handler) http.HandlerFunc {
 	})
 }
 
-func GetUserIDFromContext(ctx context.Context) any {
-	userID := ctx.Value(userIDKey)
+func GetUserIDFromContext(ctx context.Context) string {
+	userID := ctx.Value(userIDKey).(string)
 	return userID
 }
 
