@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
 import AddProduct from "../components/AddProduct";
 import UpdateProduct from "../components/UpdateProduct";
-// import AuthContext from "../AuthContext";
 import toast from "react-hot-toast";
 
 function Inventory() {
@@ -12,20 +11,11 @@ function Inventory() {
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const rowsPerPage = 7; // Set the limit of rows per page to 7
-
   const [updatePage, setUpdatePage] = useState(true);
 
   useEffect(() => {
     fetchProductsData();
   }, [updatePage]);
-
-  // Fetching Data of All Products, delete when you connect to the backend and use the other one
-
-  // const fetchProductsData = () => {
-  //   fetchProductsData()
-
-  //   setAllProducts(mockData.data);
-  // };
 
   const fetchProductsData = () => {
     fetch(`http://localhost:8080/items`, {
@@ -35,36 +25,41 @@ function Inventory() {
         Authorization: `Bearer ${localStorage.getItem("token")}`,
       },
     })
-      .then((response) => response.json())
-      .then((data) => {
-        console.log(data);
-        setAllProducts(data.data);
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error('Network response was not ok');
+        }
+        return response.json();
       })
-      .catch((err) => console.log(err));
+      .then((data) => {
+        if (Array.isArray(data.data)) {
+          setAllProducts(data.data);
+        } else {
+          setAllProducts([]); // Fallback to empty array if data.data is not an array
+          console.error("Expected an array in the response data");
+        }
+      })
+      .catch((err) => {
+        console.error("Failed to fetch products data:", err);
+        setAllProducts([]); // Set to empty array to prevent errors in rendering
+      });
   };
-
-  console.log("products", products);
-
-  // Fetching Data of Search Products
-
-  // Modal for Product ADD
+  
   const addProductModalSetting = () => {
     setShowProductModal(!showProductModal);
   };
 
-  // Modal for Product UPDATE
   const updateProductModalSetting = (selectedProductData) => {
     console.log("Clicked: edit");
     setUpdateProduct(selectedProductData);
     setShowUpdateModal(!showUpdateModal);
   };
 
-  // Delete item
   const deleteItem = (id) => {
     console.log("Product ID: ", id);
 
     fetch(`http://localhost:8080/item/${id}`, {
-      method: "DELETE", // Assuming DELETE method is used for deletion
+      method: "DELETE",
       headers: {
         "Content-Type": "application/json",
         Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -79,29 +74,28 @@ function Inventory() {
       })
       .then((data) => {
         setUpdatePage((prevState) => !prevState);
-        toast.success("Item deleted successfully!"); // Show alert on successful deletion
+        toast.success("Item deleted successfully!");
       })
       .catch((err) => {
         console.error(err);
         toast.error("Failed to delete the item.");
       });
   };
-  // Handle search input
+
   const handleSearchTerm = (event) => {
     setSearchTerm(event.target.value);
-    setCurrentPage(1); // Reset to the first page when search term changes
+    setCurrentPage(1);
   };
 
-  // Filter products based on search term
-  const filteredProducts = products.filter(
+  const filteredProducts = products?.filter(
     (product) =>
       product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       product.type.toLowerCase().includes(searchTerm.toLowerCase())
   );
-  // Pagination logic
+
   const indexOfLastProduct = currentPage * rowsPerPage;
   const indexOfFirstProduct = indexOfLastProduct - rowsPerPage;
-  const currentProducts = filteredProducts.slice(
+  const currentProducts = filteredProducts?.slice(
     indexOfFirstProduct,
     indexOfLastProduct
   );
@@ -110,60 +104,47 @@ function Inventory() {
 
   const paginate = (pageNumber) => setCurrentPage(pageNumber);
 
-  // Handle Page Update
   const handlePageUpdate = () => {
     setUpdatePage(!updatePage);
   };
-  // Calculate Low Stocks and Out of Stock items
-  const lowStockCount = products.filter(
+
+  const onProductUpdated = () => {
+    setUpdatePage((prevState) => !prevState);
+    toast.success("Product updated successfully!");
+  };
+
+  const lowStockCount = products?.filter(
     (product) => product.quantity < 5
   ).length;
-  const outOfStockCount = products.filter(
+  const outOfStockCount = products?.filter(
     (product) => product.quantity === 0
   ).length;
 
   return (
-    <div className="col-span-12 lg:col-span-10  flex justify-center">
-      <div className=" flex flex-col gap-5 w-11/12">
-        <div className="bg-white rounded p-3">
-          <span className="font-semibold px-4">Overall Inventory</span>
-          <div className=" flex flex-col md:flex-row justify-center items-center  ">
-            <div className="flex flex-col p-10  w-full  md:w-3/12 md:border-x-2  ">
-              <span className="font-semibold text-blue-700 text-3xl text-center">
-                Total Items
-              </span>
-              <br />
-              <span className="font-semibold text-gray-600 text-3xl text-center">
-                {products.length}
-              </span>
-              {/* <span className="font-thin text-gray-400 text-xs">
-                Last 7 days
-              </span> */}
-            </div>
-
-            <div className="flex flex-col gap-3 p-10  w-full  md:w-3/12  border-y-2   md:border-y-0">
-              <span className="font-semibold text-red-700 text-3xl text-center">
-                Low Stocks
-              </span>
-              <div className="flex gap-12 justify-center ">
-                <div className="flex flex-col text-center">
-                  <span className="font-semibold text-gray-600 text-4xl text-center">
-                    {lowStockCount}
-                  </span>
-                  <span className="font-thin text-red-400 text-base">Low</span>
-                </div>
-                <div className="flex flex-col">
-                  <span className="font-semibold text-gray-600 text-4xl text-center">
-                    {outOfStockCount}
-                  </span>
-                  <span className="font-thin text-red-400 text-base">
-                    Not in Stock
-                  </span>
-                </div>
-              </div>
-            </div>
-          </div>
+    <div className="col-span-12 lg:col-span-10 flex justify-center">
+      <div className="flex flex-col gap-5 w-11/12">
+      <div className="bg-white rounded-lg shadow-lg p-6">
+  <h2 className="font-semibold text-xl text-gray-800 mb-4 px-4">Overall Inventory</h2>
+  <div className="flex flex-col md:flex-row justify-around items-center gap-6">
+    <div className="flex flex-col p-10 w-full md:w-3/12 bg-blue-50 rounded-lg shadow-md text-center">
+      <h3 className="font-semibold text-blue-700 text-3xl mb-2">Total Items</h3>
+      <span className="font-semibold text-gray-600 text-4xl">{products.length}</span>
+    </div>
+    <div className="flex flex-col p-10 w-full md:w-3/12 bg-red-50 rounded-lg shadow-md text-center">
+      <h3 className="font-semibold text-red-700 text-3xl mb-4">Low Stocks</h3>
+      <div className="flex gap-12 justify-center">
+        <div className="flex flex-col items-center">
+          <span className="font-semibold text-gray-600 text-4xl">{lowStockCount}</span>
+          <span className="font-thin text-red-400 text-base">Low</span>
         </div>
+        <div className="flex flex-col items-center">
+          <span className="font-semibold text-gray-600 text-4xl">{outOfStockCount}</span>
+          <span className="font-thin text-red-400 text-base">Not in Stock</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
 
         {showProductModal && (
           <AddProduct
@@ -175,114 +156,100 @@ function Inventory() {
           <UpdateProduct
             updateProductData={updateProduct}
             updateModalSetting={updateProductModalSetting}
+            onProductUpdated={onProductUpdated}
           />
         )}
 
-        {/* Table  */}
-        <div className="overflow-x-auto rounded-lg border bg-white border-gray-200 ">
-          <div className="flex justify-between pt-5 pb-3 px-3">
-            <div className="flex gap-4 justify-center items-center ">
-              <span className="font-bold">Products</span>
-              <div className="flex justify-center items-center px-2 border-2 rounded-md ">
-                <img
-                  alt="search-icon"
-                  className="w-5 h-5"
-                  src={require("../assets/search-icon.png")}
-                />
-                <input
-                  className="border-none outline-none focus:border-none text-xs"
-                  type="text"
-                  placeholder="Search here"
-                  value={searchTerm}
-                  onChange={handleSearchTerm}
-                />
-              </div>
-            </div>
-            <div className="flex gap-4">
-              <button
-                className="bg-blue-500 hover:bg-blue-700 text-white font-bold p-2 text-xs  rounded"
-                onClick={addProductModalSetting}
+<div className="overflow-x-auto rounded-lg border bg-white border-gray-200 mt-6 shadow-lg">
+  <div className="flex justify-between p-4 bg-gray-100">
+    <div className="flex gap-4 items-center">
+      <h3 className="font-bold text-lg text-gray-800">Products</h3>
+      <div className="flex items-center px-3 py-1 bg-white border rounded-md">
+        <img alt="search-icon" className="w-5 h-5" src={require("../assets/search-icon.png")} />
+        <input
+          className="border-none outline-none focus:ring-0 text-sm ml-2"
+          type="text"
+          placeholder="Search here"
+          value={searchTerm}
+          onChange={handleSearchTerm}
+        />
+      </div>
+    </div>
+    <button
+      className="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 text-xs rounded-md"
+      onClick={addProductModalSetting}
+    >
+      Add Product
+    </button>
+  </div>
+
+  {products.length === 0 ? (
+    <div className="flex flex-col items-center justify-center py-10">
+      <img
+        alt="no-items-icon"
+        className="w-20 h-20"
+        src={require("../assets/no-items-icon.png")}
+      />
+      <span className="text-gray-600 text-xl mt-3">You haven't added any items</span>
+    </div>
+  ) : (
+    <>
+      <table className="min-w-full divide-y divide-gray-200 text-sm">
+        <thead className="bg-gray-50">
+          <tr>
+            <th className="px-6 py-3 text-left font-medium text-gray-700">Food Items</th>
+            <th className="px-6 py-3 text-left font-medium text-gray-700">Type</th>
+            <th className="px-6 py-3 text-left font-medium text-gray-700">Quantity</th>
+            <th className="px-6 py-3 text-left font-medium text-gray-700">Status</th>
+            <th className="px-6 py-3 text-left font-medium text-gray-700">Actions</th>
+          </tr>
+        </thead>
+        <tbody className="divide-y divide-gray-200">
+          {currentProducts.map((element) => (
+            <tr key={element._id} className="hover:bg-gray-100">
+              <td className="px-6 py-4">{element.name}</td>
+              <td className="px-6 py-4">{element.type}</td>
+              <td className="px-6 py-4">{element.quantity}</td>
+              <td className="px-6 py-4">{element.quantity > 0 ? "In Stock" : "Not in Stock"}</td>
+              <td className="px-6 py-4 flex gap-4">
+                <button
+                  className="text-green-600 hover:text-green-800"
+                  onClick={() => updateProductModalSetting(element)}
+                >
+                  Edit
+                </button>
+                <button
+                  className="text-red-600 hover:text-red-800"
+                  onClick={() => deleteItem(element._id)}
+                >
+                  Delete
+                </button>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+
+      <div className="flex justify-end p-4">
+        <nav className="block">
+          <ul className="flex pl-0 rounded list-none flex-wrap">
+            {Array.from({ length: totalPages }, (_, i) => i + 1).map((pageNumber) => (
+              <li
+                key={pageNumber}
+                className={`first:ml-0 text-xs font-semibold flex w-6 h-6 mx-1 p-0 cursor-pointer items-center justify-center leading-tight ${
+                  pageNumber === currentPage ? "bg-gray-300 text-gray-600" : "bg-white text-gray-600"
+                }`}
+                onClick={() => paginate(pageNumber)}
               >
-                {/* <Link to="/inventory/add-product">Add Product</Link> */}
-                Add Product
-              </button>
-            </div>
-          </div>
-          <table className="min-w-full divide-y-2 divide-gray-200 text-sm">
-            <thead>
-              <tr>
-                <th className="whitespace-nowrap px-4 py-2 text-left font-medium text-gray-900">
-                  Food Items
-                </th>
-                <th className="whitespace-nowrap px-4 py-2 text-left font-medium text-gray-900">
-                  Type
-                </th>
-                <th className="whitespace-nowrap px-4 py-2 text-left font-medium text-gray-900">
-                  Quantity
-                </th>
-              </tr>
-            </thead>
-
-            <tbody className="divide-y divide-gray-200">
-              {currentProducts.map((element, index) => {
-                return (
-                  <tr key={element._id}>
-                    <td className="whitespace-nowrap px-4 py-2  text-gray-900">
-                      {element.name}
-                    </td>
-                    <td className="whitespace-nowrap px-4 py-2 text-gray-700">
-                      {element.type}
-                    </td>
-                    <td className="whitespace-nowrap px-4 py-2 text-gray-700">
-                      {element.quantity}
-                    </td>
-
-                    <td className="whitespace-nowrap px-4 py-2 text-gray-700">
-                      {element.quantity > 0 ? "In Stock" : "Not in Stock"}
-                    </td>
-                    <td className="whitespace-nowrap px-4 py-2 text-gray-700">
-                      <span
-                        className="text-green-700 cursor-pointer"
-                        onClick={() => updateProductModalSetting(element)}
-                      >
-                        Edit{" "}
-                      </span>
-                      <span
-                        className="text-red-600 px-2 cursor-pointer"
-                        onClick={() => deleteItem(element._id)}
-                      >
-                        Delete
-                      </span>
-                    </td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
-          {/* Pagination */}
-          <div className="flex justify-end p-4">
-            <nav className="block">
-              <ul className="flex pl-0 rounded list-none">
-                {Array.from({ length: totalPages }, (_, i) => i + 1).map(
-                  (number) => (
-                    <li key={number}>
-                      <button
-                        onClick={() => paginate(number)}
-                        className={`${
-                          currentPage === number
-                            ? "bg-blue-500 text-white"
-                            : "bg-white text-blue-500"
-                        } hover:bg-blue-700 hover:text-white font-bold py-2 px-4 rounded mx-1`}
-                      >
-                        {number}
-                      </button>
-                    </li>
-                  )
-                )}
-              </ul>
-            </nav>
-          </div>
-        </div>
+                {pageNumber}
+              </li>
+            ))}
+          </ul>
+        </nav>
+      </div>
+    </>
+  )}
+</div>
       </div>
     </div>
   );

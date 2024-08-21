@@ -6,6 +6,7 @@ import toast from "react-hot-toast";
 export default function UpdateProduct({
   updateProductData,
   updateModalSetting,
+  onProductUpdated, // Callback function to refresh data
 }) {
   const { _id, name, quantity, type } = updateProductData;
   const [product, setProduct] = useState({
@@ -26,16 +27,15 @@ export default function UpdateProduct({
   };
 
   const updateProduct = () => {
-    // Check if the data is empty or unchanged
-    if (
-      !product.name ||
-      !product.type ||
-      !product.quantity ||
-      (product.name === name &&
-        product.type === type &&
-        product.quantity === quantity)
-    ) {
-      toast.error("No changes detected or fields are empty.");
+    // Check if required fields are empty
+    if (!product.name || !product.type || product.quantity === null || product.quantity === undefined) {
+      toast.error("Fields cannot be empty.");
+      return;
+    }
+
+    // Check if data is unchanged
+    if (product.name === name && product.type === type && product.quantity === quantity) {
+      toast.error("No changes detected.");
       return;
     }
 
@@ -49,8 +49,15 @@ export default function UpdateProduct({
       body: JSON.stringify(product),
     })
       .then((result) => {
-        toast.success("Product Updated");
-        setOpen(false);
+        if (result.ok) {
+          toast.success("Product Updated");
+          setOpen(false);
+          if (onProductUpdated) {
+            onProductUpdated(); // Trigger parent component to refresh data
+          }
+        } else {
+          toast.error("Failed to update product.");
+        }
       })
       .catch((err) => console.log(err));
   };
@@ -151,7 +158,7 @@ export default function UpdateProduct({
                               Quantity
                             </label>
                             <input
-                              type="text"
+                              type="number"
                               name="quantity"
                               id="quantity"
                               value={product.quantity}
@@ -159,7 +166,7 @@ export default function UpdateProduct({
                                 handleInputChange(e.target.name, e.target.value)
                               }
                               className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5"
-                              placeholder="Ex. Apple"
+                              placeholder="Ex. 10"
                             />
                           </div>
                         </div>

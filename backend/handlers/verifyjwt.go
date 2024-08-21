@@ -1,6 +1,7 @@
 package middlewares
 
 import (
+	"context"
 	"fmt"
 	"net/http"
 	"strings"
@@ -10,6 +11,10 @@ import (
 )
 
 var mySigningKey = []byte(DotEnvVariable("JWT_SECRET"))
+
+type contextKey string
+
+const userIDKey contextKey = "userID"
 
 // IsAuthorized -> verify jwt header
 func IsAuthorized(next http.Handler) http.HandlerFunc {
@@ -31,13 +36,31 @@ func IsAuthorized(next http.Handler) http.HandlerFunc {
 				UnauthorizedErrResponse(err.Error(), w)
 			}
 
-			if token.Valid {
-				next.ServeHTTP(w, r)
+			// / Check if the token is valid
+			if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
+				// Extract the user ID from the claims
+				userID, ok := claims["id"].(string)
+				if !ok {
+					UnauthorizedErrResponse("Invalid token claims", w)
+					return
+				}
+
+				// Add the user ID to the request context
+				ctx := context.WithValue(r.Context(), userIDKey, userID)
+				next.ServeHTTP(w, r.WithContext(ctx))
+			} else {
+				UnauthorizedErrResponse("Not Authorized", w)
 			}
+
 		} else {
 			UnauthorizedErrResponse("Not Authorized", w)
 		}
 	})
+}
+
+func GetUserIDFromContext(ctx context.Context) any {
+	userID := ctx.Value(userIDKey)
+	return userID
 }
 
 // GenerateJWT -> generate jwt

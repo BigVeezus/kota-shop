@@ -3,7 +3,7 @@ import { Disclosure, Menu, Transition } from "@headlessui/react";
 import { Bars3Icon, BellIcon, XMarkIcon } from "@heroicons/react/24/outline";
 import AuthContext from "../AuthContext";
 import { Link } from "react-router-dom";
-
+import waterfall from "../assets/water-fall.jpg";
 const navigation = [
  
   { name: "Dashboard", href: "/inventory", current: true },
@@ -60,7 +60,7 @@ export default function Header() {
                             <span className="sr-only">Open user menu</span>
                             <img
                               className="h-8 w-8 rounded-full"
-                              src="https://i.pravatar.cc/300"
+                              src={waterfall}
                               alt="profile"
                             />
                           </Menu.Button>
@@ -79,13 +79,14 @@ export default function Header() {
                               <Menu.Item key={item.name}>
                                 {({ active }) => (
                                   <Link
-                                    to={item.href}
+                                  
+                                  onClick={() => authContext.logout()}
                                     className={classNames(
                                       active ? "bg-gray-100" : "",
                                       "block px-4 py-2 text-sm text-gray-700"
                                     )}
                                   >
-                                    <span onClick={() => authContext.signout()}>
+                                    <span onClick={() => authContext.logout()}>
                                       {item.name}{" "}
                                     </span>
                                   </Link>
@@ -143,7 +144,7 @@ export default function Header() {
                     <div className="flex-shrink-0">
                       <img
                         className="h-10 w-10 rounded-full"
-                              src="https://i.pravatar.cc/300"
+                              src={waterfall}
                         alt="profile"
                       />
                     </div>
@@ -158,12 +159,13 @@ export default function Header() {
                   <div className="mt-3 space-y-1 px-2">
                     {userNavigation.map((item) => (
                       <Disclosure.Button
+                      onClick={() => authContext.logout()}
                         key={item.name}
                         as="a"
-                        href={item.href}
+                 
                         className="block rounded-md px-3 py-2 text-base font-medium text-gray-400 hover:bg-gray-700 hover:text-white"
                       >
-                        <span onClick={() => authContext.signout()}>
+                        <span>
                           {item.name}{" "}
                         </span>
                       </Disclosure.Button>

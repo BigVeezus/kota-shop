@@ -21,8 +21,9 @@ var foodItemsCollection = client.Database("kota-shop").Collection("food-items")
 
 // CreateItemEndpoint -> create item
 var CreateItem = http.HandlerFunc(func(response http.ResponseWriter, request *http.Request) {
-	var ctx, cancel = context.WithTimeout(context.Background(), 5*time.Second)
-	defer cancel()
+	var ctx = request.Context()
+
+	userId := middlewares.GetUserIDFromContext(ctx)
 
 	var item models.FoodItemModel
 	err := json.NewDecoder(request.Body).Decode(&item)
@@ -35,7 +36,10 @@ var CreateItem = http.HandlerFunc(func(response http.ResponseWriter, request *ht
 		return
 	}
 
+	id := middlewares.RemoveExtraQuotes(userId.(string))
+
 	item.ID = primitive.NewObjectID()
+	item.UserId = id
 	item.CreatedAt, _ = time.Parse(time.RFC3339, time.Now().Format(time.RFC3339))
 	item.UpdatedAt = item.CreatedAt
 
@@ -50,12 +54,15 @@ var CreateItem = http.HandlerFunc(func(response http.ResponseWriter, request *ht
 
 // GetAllItemsEndpoint -> get items
 var GetAllItems = http.HandlerFunc(func(response http.ResponseWriter, request *http.Request) {
-	var ctx, cancel = context.WithTimeout(context.Background(), 5*time.Second)
-	defer cancel()
+	var ctx = request.Context()
+
+	userId := middlewares.GetUserIDFromContext(ctx)
+
+	id := middlewares.RemoveExtraQuotes(userId.(string))
 
 	var items []*models.FoodItemModel
 
-	cursor, err := foodItemsCollection.Find(ctx, bson.D{})
+	cursor, err := foodItemsCollection.Find(ctx, bson.M{"userId": id})
 	if err != nil {
 		middlewares.InternalServerErrResponse(err.Error(), response)
 		return

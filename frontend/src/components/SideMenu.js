@@ -1,6 +1,6 @@
 import React from "react";
 import { Link, useLocation } from "react-router-dom";
-
+import waterfall from "../assets/water-fall.jpg";
 function SideMenu() {
   const localStorageData = JSON.parse(localStorage.getItem("user"));
   const location = useLocation();
@@ -40,15 +40,13 @@ function SideMenu() {
         <div className="flex items-center gap-2 bg-white p-4 hover:bg-gray-50">
           <img
             alt="Profile"
-                src="https://i.pravatar.cc/300"
+                src={waterfall}
             className="h-10 w-10 rounded-full object-cover"
           />
 
           <div>
             <p className="text-xs">
-              {/* <strong className="block font-medium">
-                {localStorageData.firstName + " " + localStorageData.lastName}
-              </strong> */}
+          
 
               <span> {localStorageData.email} </span>
             </p>

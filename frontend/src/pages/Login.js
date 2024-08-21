@@ -10,6 +10,7 @@ function Login() {
     password: "",
   });
 
+ 
   const authContext = useContext(AuthContext);
   const navigate = useNavigate();
 
@@ -18,12 +19,11 @@ function Login() {
   };
 
   const loginUser = (e) => {
-    e.preventDefault(); // Prevent default form submission
+    e.preventDefault(); 
 
-    // Validate form data
     if (form.email === "" || form.password === "") {
       toast.error("To login user, enter details to proceed...");
-      return; // Prevent API call if validation fails
+      return; 
     }
 
     fetch("http://localhost:8080/login", {
@@ -37,24 +37,20 @@ function Login() {
       .then((data) => {
         if (data.status === 200) {
           toast.success("Login Successful");
-
-          // Store user data and token in localStorage
-          localStorage.setItem("user", JSON.stringify(data.data));
-          localStorage.setItem("token", data.token);
-
-          // Sign in and navigate to the home page
-          authContext.signin(data.data._id, () => {
-            navigate("/");
-          });
+console.log("data", data);
+authContext.signin(data.token, data.data, () => {
+  navigate("/");
+});
         } else {
           toast.error("Wrong credentials, Try again");
         }
       })
       .catch((error) => {
         toast.error("An error occurred. Please try again.");
-        console.log("Something went wrong", error);
+        console.error("Something went wrong", error);
       });
   };
+
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -139,9 +135,9 @@ function Login() {
               </div>
 
               <div className="text-sm">
-                <span className="font-medium text-indigo-600 hover:text-indigo-500">
+                {/* <span className="font-medium text-indigo-600 hover:text-indigo-500">
                   Forgot your password?
-                </span>
+                </span> */}
               </div>
             </div>
 

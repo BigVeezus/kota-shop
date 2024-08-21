@@ -2,14 +2,14 @@ import AuthContext from "./AuthContext";
 import { useContext } from "react";
 import { Navigate } from "react-router-dom";
 
-function ProtectedWrapper(props) {
+function ProtectedWrapper({ children }) {
   const auth = useContext(AuthContext);
-
-
-  if (!auth.user) {
+console.log("auth", auth);
+  if (!auth.user || !auth.authToken) {
     return <Navigate to="/login" replace />;
   }
 
-  return props.children;
+  return children;
 }
+
 export default ProtectedWrapper;

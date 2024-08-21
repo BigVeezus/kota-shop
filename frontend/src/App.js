@@ -1,46 +1,23 @@
-import React from "react";
-import Login from "./pages/Login";
-import Register from "./pages/Register";
-
-import "./index.css";
+import React, { useEffect, useState } from "react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Layout from "./components/Layout";
 import Inventory from "./pages/Inventory";
 import NoPageFound from "./pages/NoPageFound";
-import AuthContext from "./AuthContext";
+import Login from "./pages/Login";
+import Register from "./pages/Register";
 import ProtectedWrapper from "./ProtectedWrapper";
-import { useEffect, useState } from "react";
-
+import { AuthProvider } from "./AuthContext"; // Updated import
 import { Toaster } from "react-hot-toast";
 
+import "./index.css";
+
 const App = () => {
-  const [user, setUser] = useState("");
+  
   const [loader, setLoader] = useState(true);
-  let myLoginUser = JSON.parse(localStorage.getItem("user"));
-  // console.log("USER: ",user)
 
   useEffect(() => {
-    if (myLoginUser) {
-      setUser(myLoginUser._id);
-      setLoader(false);
-      // console.log("inside effect", myLoginUser)
-    } else {
-      setUser("");
-      setLoader(false);
-    }
-  }, [myLoginUser]);
-
-  const signin = (newUser, callback) => {
-    setUser(newUser);
-    callback();
-  };
-
-  const signout = () => {
-    setUser(null);
-    localStorage.removeItem("user");
-  };
-
-  let value = { user, signin, signout };
+    setLoader(false);
+  }, []);
 
   if (loader)
     return (
@@ -57,7 +34,7 @@ const App = () => {
     );
 
   return (
-    <AuthContext.Provider value={value}>
+    <AuthProvider>
       <BrowserRouter>
         <Routes>
           <Route path="/login" element={<Login />} />
@@ -72,13 +49,12 @@ const App = () => {
           >
             <Route index element={<Inventory />} />
             {/* <Route path="/inventory" element={<Inventory />} /> */}
-     
           </Route>
           <Route path="*" element={<NoPageFound />} />
         </Routes>
       </BrowserRouter>
       <Toaster />
-    </AuthContext.Provider>
+    </AuthProvider>
   );
 };
 
