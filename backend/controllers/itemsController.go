@@ -26,11 +26,8 @@ var CreateItem = http.HandlerFunc(func(response http.ResponseWriter, request *ht
 	userId := middlewares.GetUserIDFromContext(ctx)
 
 	var item models.FoodItemModel
-	err := json.NewDecoder(request.Body).Decode(&item)
-	if err != nil {
-		middlewares.InternalServerErrResponse(err.Error(), response)
-		return
-	}
+	json.NewDecoder(request.Body).Decode(&item)
+
 	if ok, errors := validators.ValidateInputs(item); !ok {
 		middlewares.ValidationResponse(errors, response)
 		return
@@ -39,11 +36,11 @@ var CreateItem = http.HandlerFunc(func(response http.ResponseWriter, request *ht
 	id := middlewares.RemoveExtraQuotes(userId)
 
 	item.ID = primitive.NewObjectID()
-	item.UserId = id
+	item.UserId = &id
 	item.CreatedAt, _ = time.Parse(time.RFC3339, time.Now().Format(time.RFC3339))
 	item.UpdatedAt = item.CreatedAt
 
-	_, err = foodItemsCollection.InsertOne(ctx, item)
+	_, err := foodItemsCollection.InsertOne(ctx, item)
 	if err != nil {
 		middlewares.InternalServerErrResponse(err.Error(), response)
 		return

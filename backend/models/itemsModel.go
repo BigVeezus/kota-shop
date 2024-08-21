@@ -8,7 +8,7 @@ import (
 
 type FoodItemModel struct {
 	ID        primitive.ObjectID `json:"_id,omitempty" bson:"_id,omitempty"`
-	UserId    string             `json:"userId" bson:"userId"`
+	UserId    *string            `json:"userId" bson:"userId"`
 	Name      string             `json:"name,omitempty" bson:"name,omitempty" validate:"required"`
 	Type      string             `json:"type" bson:"type,omitempty" validate:"eq=FRUIT|eq=FOOD|eq=DRINK|eq=SNACK"`
 	Quantity  int                `json:"quantity" bson:"quantity,omitempty" validate:"required"`
